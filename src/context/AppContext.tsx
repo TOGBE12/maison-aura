@@ -463,8 +463,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       showToast(`Bienvenue de retour, ${response.user.name}`, 'success');
       return true;
-    } catch {
-      showToast('Email ou mot de passe incorrect.', 'error');
+    } catch (err: unknown) {
+      const apiMsg = err && typeof err === 'object' && 'message' in err
+        ? (err as { message: string }).message
+        : 'Email ou mot de passe incorrect.';
+      showToast(apiMsg, 'error');
       return false;
     }
   };
@@ -482,8 +485,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       showToast(`Bienvenue, ${response.user.name} !`, 'success');
       return true;
-    } catch {
-      showToast('Erreur lors de l\'inscription.', 'error');
+    } catch (err: unknown) {
+      const apiMsg = err && typeof err === 'object' && 'message' in err
+        ? (err as { message: string }).message
+        : 'Erreur lors de l\'inscription.';
+      showToast(apiMsg, 'error');
       return false;
     }
   };

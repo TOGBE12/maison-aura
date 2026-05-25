@@ -34,7 +34,15 @@ async function request<T>(
     };
     try {
       error.data = await response.json();
-      error.message = error.data?.message || error.message;
+      const d = error.data as Record<string, unknown>;
+      if (d?.message && typeof d.message === 'string') {
+        error.message = d.message;
+      } else if (d?.errors && typeof d.errors === 'object') {
+        const firstErr = Object.values(d.errors as Record<string, string[]>).find(Boolean);
+        if (firstErr && Array.isArray(firstErr) && firstErr.length > 0) {
+          error.message = firstErr[0];
+        }
+      }
     } catch {}
     throw error;
   }
