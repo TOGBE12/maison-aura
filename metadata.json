@@ -1,0 +1,6 @@
+{
+  "name": "Maison Aura - Boutique e-commerce premium",
+  "description": "Une boutique de sacs de luxe d'inspiration haute couture et un espace d'administration complet pour la gestion des produits, commandes et stocks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;750&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* Custom animations and utilities */
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-spin-slow {
+  animation: spin 14s linear infinite;
+}
+
+/* Keyframes for simple fade */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll smoothness */
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+/* Beautiful transitions */
+input, select, textarea, button {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dynamic theme overrides to hook hardcoded elements to context state */
+:root {
+  --theme-accent: #BF986B;
+  --theme-accent-hover: #A88056;
+  --theme-bg-page: #FAF8F5;
+  --theme-text-primary: #2C2621;
+  --theme-text-muted: #7D7670;
+  --theme-card-bg: #ffffff;
+  --theme-border: #EAE2D8;
+  --theme-nude-tint: rgba(242, 237, 217, 0.3);
+}
+
+/* Base Body transitions */
+body, #storefront-main-layout {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* 1. Theme Accent Overrides */
+.text-\[\#BF986B\], 
+.group-hover\:text-\[\#BF986B\]:hover, 
+.group:hover .group-hover\:text-\[\#BF986B\],
+.hover\:text-\[\#BF986B\]:hover {
+  color: var(--theme-accent) !important;
+}
+
+.bg-\[\#BF986B\],
+.hover\:bg-\[\#BF986B\]:hover {
+  background-color: var(--theme-accent) !important;
+}
+
+.bg-\[\#BF986B\]\/10 {
+  background-color: color-mix(in srgb, var(--theme-accent) 10%, transparent) !important;
+}
+
+.bg-\[\#BF986B\]\/30 {
+  background-color: color-mix(in srgb, var(--theme-accent) 30%, transparent) !important;
+}
+
+.border-\[\#BF986B\],
+.border-\[\#BF986B\]\/30,
+.border-\[\#BF986B\]\/40 {
+  border-color: var(--theme-accent) !important;
+}
+
+svg.text-\[\#BF986B\] {
+  color: var(--theme-accent) !important;
+}
+
+svg[fill="#BF986B"] {
+  fill: var(--theme-accent) !important;
+}
+
+/* Dashboard link override */
+.text-\[\#D0A352\] {
+  color: var(--theme-accent) !important;
+}
+
+/* 2. Text Color Overrides */
+.text-\[\#2C2621\] {
+  color: var(--theme-text-primary) !important;
+}
+.text-\[\#7D7670\] {
+  color: var(--theme-text-muted) !important;
+}
+
+/* 3. Section and Card Background Overrides */
+.bg-\[\#FAF8F5\] {
+  background-color: var(--theme-bg-page) !important;
+}
+
+.bg-\[\#F5F2ED\] {
+  background-color: color-mix(in srgb, var(--theme-bg-page) 95%, black 5%) !important;
+}
+
+.bg-neutral-50\/50 {
+  background-color: color-mix(in srgb, var(--theme-bg-page) 98%, black 2%) !important;
+}
+
+.bg-\[\#FCFAF7\] {
+  background-color: color-mix(in srgb, var(--theme-bg-page) 99%, black 1%) !important;
+}
+
+/* 4. Borders and Tint Overrides */
+.border-\[\#EAE2D8\] {
+  border-color: var(--theme-border) !important;
+}
+
+.bg-\[\#F2EDD9\]\/30 {
+  background-color: var(--theme-nude-tint) !important;
+}
+
