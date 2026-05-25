@@ -21,8 +21,12 @@ export const Shop: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Categories list
-  const categoriesList = ['Tous', 'Sacs de luxe', 'Sacs à main', 'Sacs de voyage', 'Sacs fashion', 'Sacs scolaires'];
+  // Categories list (from localStorage or defaults)
+  const categoriesList = React.useMemo(() => {
+    const saved = localStorage.getItem('mv_luxury_categories');
+    const cats = saved ? JSON.parse(saved) : ['Sacs de luxe', 'Sacs à main', 'Sacs de voyage', 'Sacs fashion', 'Sacs scolaires'];
+    return ['Tous', ...cats];
+  }, []);
 
   // Handle category shift
   const handleCategoryShift = (cat: string) => {

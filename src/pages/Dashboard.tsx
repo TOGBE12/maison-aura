@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Order } from '../types';
 import {
@@ -61,6 +61,15 @@ export const Dashboard: React.FC = () => {
   // Modal managing states
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
+  // Categories state (persisted to localStorage)
+  const DEFAULT_CATEGORIES = ['Sacs de luxe', 'Sacs à main', 'Sacs de voyage', 'Sacs fashion', 'Sacs scolaires'];
+  const [categories, setCategories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('mv_luxury_categories');
+    return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
+  });
 
   // Form states for creating/editing product
   const [prodName, setProdName] = useState('');
@@ -190,6 +199,26 @@ export const Dashboard: React.FC = () => {
     }
 
     setIsProductModalOpen(false);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('mv_luxury_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  const handleAddCategory = () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      showToast('Veuillez entrer un nom de catégorie.', 'error');
+      return;
+    }
+    if (categories.includes(trimmed)) {
+      showToast('Cette catégorie existe déjà.', 'error');
+      return;
+    }
+    setCategories(prev => [...prev, trimmed]);
+    setNewCategoryName('');
+    setIsCategoryModalOpen(false);
+    showToast(`Catégorie "${trimmed}" ajoutée !`, 'success');
   };
 
   const handleDeleteProduct = (productId: string, name: string) => {
@@ -660,15 +689,25 @@ export const Dashboard: React.FC = () => {
                 </p>
               </div>
 
-              {/* Add product button trigger */}
-              <button
-                onClick={() => handleOpenProductModal()}
-                className="px-6 py-3 bg-[#BF986B] text-white hover:bg-[#A88056] text-xs font-mono font-bold tracking-widest uppercase rounded-full flex items-center gap-2 transition-all shadow-md cursor-pointer"
-                id="add-product-table-trigger"
-              >
-                <Plus size={14} />
-                Nouveau Modèle
-              </button>
+              {/* Action buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => { setNewCategoryName(''); setIsCategoryModalOpen(true); }}
+                  className="px-6 py-3 border-2 border-dashed border-neutral-300 text-neutral-500 hover:border-[#BF986B] hover:text-[#BF986B] text-xs font-mono font-bold tracking-widest uppercase rounded-full flex items-center gap-2 transition-all cursor-pointer"
+                  id="add-category-trigger"
+                >
+                  <Plus size={14} />
+                  Ajouter Catégorie
+                </button>
+                <button
+                  onClick={() => handleOpenProductModal()}
+                  className="px-6 py-3 bg-[#BF986B] text-white hover:bg-[#A88056] text-xs font-mono font-bold tracking-widest uppercase rounded-full flex items-center gap-2 transition-all shadow-md cursor-pointer"
+                  id="add-product-table-trigger"
+                >
+                  <Plus size={14} />
+                  Nouveau Modèle
+                </button>
+              </div>
             </div>
 
             {/* Catalog list in high-end administrative row-cards */}
@@ -1172,11 +1211,9 @@ export const Dashboard: React.FC = () => {
                       onChange={(e) => setProdCategory(e.target.value)}
                       className="bg-neutral-50 px-3 py-2 text-xs border rounded-lg focus:outline-none focus:border-neutral-900"
                     >
-                      <option value="Sacs de luxe">Sacs de luxe</option>
-                      <option value="Sacs à main">Sacs à main</option>
-                      <option value="Sacs de voyage">Sacs de voyage</option>
-                      <option value="Sacs fashion">Sacs fashion</option>
-                      <option value="Sacs scolaires">Sacs scolaires</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -1341,6 +1378,69 @@ export const Dashboard: React.FC = () => {
 
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* Category Modal */}
+      <AnimatePresence>
+        {isCategoryModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setIsCategoryModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl border border-neutral-100 max-w-md w-full p-6 flex flex-col gap-5"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="font-serif text-lg uppercase tracking-wide text-neutral-800">
+                  Ajouter une catégorie
+                </h2>
+                <button
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="p-1 hover:bg-neutral-100 rounded-full transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
+                  Nom de la catégorie
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Sacs à dos"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddCategory(); }}
+                  className="bg-neutral-50 px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:border-neutral-900"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 mt-2">
+                <button
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleAddCategory}
+                  className="px-6 py-2.5 bg-[#141414] text-white hover:bg-[#BF986B] text-xs font-mono font-bold tracking-widest uppercase rounded-xl transition-all cursor-pointer"
+                >
+                  Ajouter
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
