@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Mail, Lock, User, Key, ArrowRight, ShieldCheck } from 'lucide-react';
-import { motion } from 'motion/react';
 
 export const Auth: React.FC = () => {
   const { login, register, navigateTo, showToast, customRoute } = useApp();
@@ -69,10 +68,7 @@ export const Auth: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto px-4 py-32 min-h-screen flex items-center justify-center" id="auth-page-container">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+      <div
         className="w-full bg-white p-6 md:p-8 rounded-2xl border border-neutral-100 shadow-xl"
       >
         
@@ -235,7 +231,7 @@ export const Auth: React.FC = () => {
           <span>Charte de protection des données SSL activée</span>
         </div>
 
-      </motion.div>
+      </div>
     </div>
   );
 };

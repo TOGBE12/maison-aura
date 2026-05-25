@@ -68,7 +68,7 @@ function StoreShell() {
 
       {/* 2. Page viewport with Framer Motion slide-in fade animation */}
       <main className={`flex-grow ${!isDashboardView ? 'pt-14' : ''}`}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={customRoute.page + (customRoute.params.id || '')}
             initial={{ opacity: 0, y: 10 }}
