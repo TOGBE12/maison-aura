@@ -116,10 +116,10 @@ export const Dashboard: React.FC = () => {
       setProdPrice(290);
       setProdOldPrice('');
       setProdStock(10);
-      setProdDesc('Une nouvelle création de maroquinerie issue de l’Atelier Maison Aura.');
+      setProdDesc('Une nouvelle création de maroquinerie issue de l’Atelier MV LUXURY.');
       setProdColors(['#141414', '#e2ceb8']);
       setProdImageChosen(LUXURY_BAG_IMAGE_PRESETS[Math.floor(Math.random() * LUXURY_BAG_IMAGE_PRESETS.length)]);
-      setProdCustomSku('M-AURA-' + Math.floor(10000 + Math.random() * 90000));
+      setProdCustomSku('M-MV-' + Math.floor(10000 + Math.random() * 90000));
     }
     setIsProductModalOpen(true);
   };
@@ -230,7 +230,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between pb-6 border-b border-neutral-800">
           {!isSidebarCollapsed && (
             <div className="overflow-hidden">
-              <span className="font-serif text-lg tracking-[0.2em] font-light">MAISON AURA</span>
+              <span className="font-serif text-lg tracking-[0.2em] font-light">MV LUXURY</span>
               <p className="text-[8px] uppercase tracking-widest text-[#BF986B] font-mono mt-0.5 font-bold">MODE ADMINISTRATEUR</p>
             </div>
           )}
@@ -381,7 +381,7 @@ export const Dashboard: React.FC = () => {
 
       {/* MOBILE FLOATING TAB HEADER */}
       <div className="md:hidden bg-[#141414] text-white px-4 py-3 flex items-center justify-between z-30 shadow-md">
-        <span className="font-serif text-lg tracking-widest font-light">MAISON AURA</span>
+        <span className="font-serif text-lg tracking-widest font-light">MV LUXURY</span>
         
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -942,7 +942,7 @@ export const Dashboard: React.FC = () => {
                 Solde & Chiffre d’Affaires
               </h1>
               <p className="text-xs text-neutral-400 font-mono tracking-widest mt-1">
-                Analyse de rentabilité de la boutique Maison Aura et suivi des performances de vente.
+                Analyse de rentabilité de la boutique MV LUXURY et suivi des performances de vente.
               </p>
             </div>
 

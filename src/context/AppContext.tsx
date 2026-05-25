@@ -56,7 +56,7 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 // Core Seed Data for Orders
 const SEED_ORDERS: Order[] = [
   {
-    id: 'AURA-29471',
+    id: 'MV-29471',
     customerName: 'Clémence Dubois',
     customerEmail: 'clemence.dubois@me.com',
     customerPhone: '+33 6 45 89 23 11',
@@ -79,7 +79,7 @@ const SEED_ORDERS: Order[] = [
     createdAt: '2026-05-14T14:32:00Z'
   },
   {
-    id: 'AURA-29472',
+    id: 'MV-29472',
     customerName: 'Sophie Martin',
     customerEmail: 'sophie.martin@gmail.com',
     customerPhone: '+33 7 12 34 56 78',
@@ -102,7 +102,7 @@ const SEED_ORDERS: Order[] = [
     createdAt: '2026-05-16T10:15:00Z'
   },
   {
-    id: 'AURA-29473',
+    id: 'MV-29473',
     customerName: 'Marc-Antoine de la Roche',
     customerEmail: 'ma.roche@chateau.fr',
     customerPhone: '+33 6 88 99 00 11',
@@ -125,7 +125,7 @@ const SEED_ORDERS: Order[] = [
     createdAt: '2026-05-18T09:44:00Z'
   },
   {
-    id: 'AURA-29474',
+    id: 'MV-29474',
     customerName: 'Léa Chevalier',
     customerEmail: 'lea.chevalier@sciencespo.fr',
     customerPhone: '+33 6 44 21 89 77',
@@ -148,7 +148,7 @@ const SEED_ORDERS: Order[] = [
     createdAt: '2026-05-19T11:20:00Z'
   },
   {
-    id: 'AURA-29475',
+    id: 'MV-29475',
     customerName: 'Chloé Bernard',
     customerEmail: 'chloe.bern@yahoo.fr',
     customerPhone: '+33 7 98 76 54 32',
@@ -223,37 +223,37 @@ const SEED_REVIEWS: Review[] = [
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Products storage
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('maison_aura_products');
+    const saved = localStorage.getItem('mv_luxury_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
   });
 
   // Cart storage
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('maison_aura_cart');
+    const saved = localStorage.getItem('mv_luxury_cart');
     return saved ? JSON.parse(saved) : [];
   });
 
   // Orders storage
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('maison_aura_orders');
+    const saved = localStorage.getItem('mv_luxury_orders');
     return saved ? JSON.parse(saved) : SEED_ORDERS;
   });
 
   // Reviews storage
   const [reviews, setReviews] = useState<Review[]>(() => {
-    const saved = localStorage.getItem('maison_aura_reviews');
+    const saved = localStorage.getItem('mv_luxury_reviews');
     return saved ? JSON.parse(saved) : SEED_REVIEWS;
   });
 
   // User auth state (Simulated: administrator login out-of-the-box makes checking easy)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('maison_aura_user');
+    const saved = localStorage.getItem('mv_luxury_user');
     if (saved) return JSON.parse(saved);
     // Default to admin so it is ready to analyze right away, or they can toggle back.
     return {
       id: 'usr_admin',
-      name: 'Marilyn Aura (Vendeuse)',
-      email: 'marilyn@maisonaura.com',
+      name: 'Marilyn (Vendeuse)',
+      email: 'marilyn@mvluxury.com',
       isAdmin: true,
       createdAt: '2026-01-01T00:00:00Z'
     };
@@ -261,7 +261,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Theme selection
   const [themeId, setThemeId] = useState<ThemeType>(() => {
-    const saved = localStorage.getItem('maison_aura_theme');
+    const saved = localStorage.getItem('mv_luxury_theme');
     return (saved as ThemeType) || 'aura-luxe';
   });
 
@@ -281,31 +281,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Persistence hooks
   useEffect(() => {
-    localStorage.setItem('maison_aura_products', JSON.stringify(products));
+    localStorage.setItem('mv_luxury_products', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('maison_aura_cart', JSON.stringify(cart));
+    localStorage.setItem('mv_luxury_cart', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem('maison_aura_orders', JSON.stringify(orders));
+    localStorage.setItem('mv_luxury_orders', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('maison_aura_reviews', JSON.stringify(reviews));
+    localStorage.setItem('mv_luxury_reviews', JSON.stringify(reviews));
   }, [reviews]);
 
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('maison_aura_user', JSON.stringify(currentUser));
+      localStorage.setItem('mv_luxury_user', JSON.stringify(currentUser));
     } else {
-      localStorage.removeItem('maison_aura_user');
+      localStorage.removeItem('mv_luxury_user');
     }
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('maison_aura_theme', themeId);
+    localStorage.setItem('mv_luxury_theme', themeId);
   }, [themeId]);
 
   // Read theme object by ID
@@ -431,7 +431,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Orders Logic
   const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>): Order => {
-    const nextId = 'AURA-' + Math.floor(10000 + Math.random() * 90000);
+    const nextId = 'MV-' + Math.floor(10000 + Math.random() * 90000);
     const newOrder: Order = {
       ...orderData,
       id: nextId,

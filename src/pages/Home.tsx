@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
       name: 'Victoire de Castellane',
       role: 'Collectionneuse',
       location: 'Genève',
-      comment: '« Maison Aura a transcendé la maroquinerie traditionnelle. J’ai acquis L’Ovo Sculptural, c’est autant une sculpture minimaliste qu’un objet utilitaire parfait. Le service de livraison privée dans l’écrin scellé à la cire est fantastique. »',
+      comment: '« MV LUXURY a transcendé la maroquinerie traditionnelle. J’ai acquis L’Ovo Sculptural, c’est autant une sculpture minimaliste qu’un objet utilitaire parfait. Le service de livraison privée dans l’écrin scellé à la cire est fantastique. »',
       rating: 5
     },
     {
@@ -73,7 +73,7 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop"
-            alt="Maison Aura Haute Couture"
+            alt="MV LUXURY Haute Couture"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover opacity-35 object-center scale-105 animate-[pulse_8s_infinite]"
           />
@@ -89,7 +89,7 @@ export const Home: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.4em] uppercase font-mono text-[#BF986B] font-bold"
           >
-            ATELIER MAISON AURA • MONACO & FLORENCE
+            ATELIER MV LUXURY • MONACO & FLORENCE
           </motion.span>
 
           {/* Large Editorial Headline */}
@@ -281,10 +281,10 @@ export const Home: React.FC = () => {
             NOTRE SAVOIR-FAIRE
           </span>
           <h2 className="font-serif text-3xl md:text-5xl font-light text-[#2C2621] uppercase leading-tight">
-            L’art secret de l’Atelier Aura
+            L’art secret de l’Atelier MV LUXURY
           </h2>
           <p className="text-sm text-neutral-600 font-sans leading-relaxed">
-            Chaque création signée Maison Aura prend naissance au cœur de notre atelier florentin. Nous sélectionnons uniquement des peaux de qualité supérieure, issues de tanneries familiales certifiées et éco-responsables.
+            Chaque création signée MV LUXURY prend naissance au cœur de notre atelier florentin. Nous sélectionnons uniquement des peaux de qualité supérieure, issues de tanneries familiales certifiées et éco-responsables.
           </p>
           <p className="text-xs text-neutral-500 font-mono tracking-wide leading-relaxed">
             Nos métaux sont coulés dans du laiton brut, puis rehaussés d'un placage or fin 24K appliqué d'un coup de pinceau millimétré. C'est cette alliance d'éthique, de patience extrême et d'audace contemporaine qui confère à nos sacs leur aura légendaire.

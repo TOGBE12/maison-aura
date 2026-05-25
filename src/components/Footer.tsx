@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
     if (!emailInput) return;
     
     // Simulate luxury invitation
-    showToast('Félicitations ! Vous êtes inscrit(e) aux invitations privées Maison Aura.', 'success');
+    showToast('Félicitations ! Vous êtes inscrit(e) aux invitations privées MV LUXURY.', 'success');
     setEmailInput('');
   };
 
@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
           
           {/* Brand Philosophy */}
           <div className="md:col-span-1 flex flex-col gap-4">
-            <h3 className="font-serif text-2xl tracking-[0.25em] font-light">MAISON AURA</h3>
+            <h3 className="font-serif text-2xl tracking-[0.25em] font-light">MV LUXURY</h3>
             <p className="text-xs text-neutral-400 mt-2 leading-relaxed font-sans max-w-sm">
               Artisanat d’exception, matières rigoureusement sélectionnées et designs sculpturaux. Notre vision de la haute maroquinerie transcende les générations.
             </p>
@@ -95,7 +95,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright & payment icons */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-10 text-[10px] text-neutral-500 font-sans tracking-widest uppercase">
           <p>
-            Maison Aura © {new Date().getFullYear()}. Confectionné de manière éthique et durable.
+            MV LUXURY © {new Date().getFullYear()}. Confectionné de manière éthique et durable.
           </p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <span>Visa</span>

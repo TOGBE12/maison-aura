@@ -10,7 +10,7 @@ async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('maison_aura_token');
+  const token = localStorage.getItem('mv_luxury_token');
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

@@ -42,7 +42,7 @@ export const PageLoader: React.FC<{ duration?: number; onComplete?: () => void }
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="font-serif text-3xl md:text-4xl tracking-[0.25em] font-light uppercase"
         >
-          MAISON AURA
+          MV LUXURY
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}

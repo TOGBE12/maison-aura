@@ -84,7 +84,7 @@ export const Auth: React.FC = () => {
         {/* Top Header details */}
         <div className="text-center mb-8">
           <span className="text-[10px] tracking-[0.3em] font-mono text-[#BF986B] uppercase font-bold">
-            CLUB PRIVILEGE MAISON AURA
+            CLUB PRIVILEGE MV LUXURY
           </span>
           <h1 className="font-serif text-2xl md:text-3xl font-light text-neutral-800 uppercase mt-2">
             {formType === 'login' && 'Se connecter'}

@@ -118,7 +118,7 @@ export const Header: React.FC = () => {
               onClick={() => navigateTo('home')}
               className="font-serif text-lg md:text-2xl tracking-[0.3em] font-light uppercase select-none cursor-pointer"
             >
-              MAISON AURA
+              MV LUXURY
             </button>
             <span className="hidden md:block text-[8px] tracking-[0.35em] text-neutral-400 uppercase mt-0.5">
               Haute Maroquinerie
@@ -409,7 +409,7 @@ export const Header: React.FC = () => {
                 )}
                 
                 <p className="text-[9px] text-center text-neutral-400 tracking-wider">
-                  Maison Aura © All Rights Reserved.
+                  MV LUXURY © All Rights Reserved.
                 </p>
               </div>
             </motion.div>

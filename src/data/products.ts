@@ -22,7 +22,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     features: [
       'Cuir de veau de Toscane tanné de manière végétale',
       'Doublure intérieure en daim de chèvre rouge impérial',
-      'Fermoir exclusif poinçonné Maison Aura',
+      'Fermoir exclusif poinçonné MV LUXURY',
       'Bandoulière amovible et ajustable',
       'Fabriqué entièrement à la main en Italie'
     ],

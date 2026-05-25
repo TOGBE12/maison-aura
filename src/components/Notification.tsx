@@ -42,7 +42,7 @@ export const Notification: React.FC = () => {
               </div>
               <div className="flex-1">
                 <p className="text-xs font-semibold text-neutral-800 uppercase tracking-widest font-mono">
-                  Maison Aura
+                  MV LUXURY
                 </p>
                 <p className="text-sm mt-0.5 text-neutral-600 font-sans">{t.message}</p>
               </div>

@@ -293,7 +293,7 @@ export const Checkout: React.FC = () => {
                           <p className="text-[8px] uppercase tracking-widest text-[#BF986B] font-mono font-bold leading-none">
                             ÉCRIN COMPANION CARD
                           </p>
-                          <h4 className="font-serif text-sm tracking-widest mt-1 font-light italic">Maison Aura</h4>
+                          <h4 className="font-serif text-sm tracking-widest mt-1 font-light italic">MV LUXURY</h4>
                         </div>
                         <CreditCard size={20} className="text-[#BF986B]" />
                       </div>
