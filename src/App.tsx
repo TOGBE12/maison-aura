@@ -11,7 +11,7 @@ import { Checkout } from './pages/Checkout';
 import { Auth } from './pages/Auth';
 import { Dashboard } from './pages/Dashboard';
 import { PageLoader } from './components/Loader';
-import { AnimatePresence, motion } from 'motion/react';
+
 
 function StoreShell() {
   const { customRoute, currentTheme } = useApp();
@@ -68,17 +68,9 @@ function StoreShell() {
 
       {/* 2. Page viewport with Framer Motion slide-in fade animation */}
       <main className={`flex-grow ${!isDashboardView ? 'pt-14' : ''}`}>
-        <AnimatePresence>
-          <motion.div
-            key={customRoute.page + (customRoute.params.id || '')}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-          >
-            {renderActivePage()}
-          </motion.div>
-        </AnimatePresence>
+        <div key={customRoute.page + (customRoute.params.id || '')}>
+          {renderActivePage()}
+        </div>
       </main>
 
       {/* 3. Footer Section (Completely hidden inside administrative dashboard to leave sidebar-driven layouts full-bleed) */}
