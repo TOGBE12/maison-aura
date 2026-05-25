@@ -64,4 +64,49 @@ export function del<T>(endpoint: string): Promise<T> {
   return request<T>(endpoint, { method: 'DELETE' });
 }
 
+export interface LoginResponse {
+  message: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    is_admin: boolean;
+    phone?: string;
+    address?: string;
+    city?: string;
+    postal_code?: string;
+    created_at: string;
+  };
+  token: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    is_admin: boolean;
+    phone?: string;
+    address?: string;
+    city?: string;
+    postal_code?: string;
+    created_at: string;
+  };
+  token: string;
+}
+
+export function loginUser(email: string, password: string): Promise<LoginResponse> {
+  return post<LoginResponse>('/auth/login', { email, password });
+}
+
+export function registerUser(name: string, email: string, password: string): Promise<RegisterResponse> {
+  return post<RegisterResponse>('/auth/register', {
+    name,
+    email,
+    password,
+    password_confirmation: password,
+  });
+}
+
 export default { get, post, put, del };

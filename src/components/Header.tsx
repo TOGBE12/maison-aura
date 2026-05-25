@@ -14,7 +14,6 @@ export const Header: React.FC = () => {
     setThemeById,
     currentUser,
     logout,
-    login,
     searchQuery,
     setSearchQuery
   } = useApp();
@@ -42,11 +41,9 @@ export const Header: React.FC = () => {
   // Quick switch role
   const handleToggleAdminMode = () => {
     if (currentUser?.isAdmin) {
-      // Degrade to regular buyer
-      login('acheteur@maisonaura.com', 'Client Privilégié', false);
+      logout();
     } else {
-      // Re-accéder à l'admin
-      login('marilyn@maisonaura.com', 'Marilyn Aura (Vendeuse)', true);
+      navigateTo('login');
     }
   };
 

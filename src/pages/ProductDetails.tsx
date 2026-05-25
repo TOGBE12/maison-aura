@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Send, ArrowRight, Heart, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -10,6 +10,7 @@ export const ProductDetails: React.FC = () => {
     addToCart,
     reviews,
     addProductReview,
+    fetchProductReviews,
     navigateTo,
     currentTheme
   } = useApp();
@@ -32,6 +33,12 @@ export const ProductDetails: React.FC = () => {
   const [revEmail, setRevEmail] = useState('');
   const [revRating, setRevRating] = useState(5);
   const [revComment, setRevComment] = useState('');
+
+  useEffect(() => {
+    if (productId) {
+      fetchProductReviews(productId);
+    }
+  }, [productId, fetchProductReviews]);
 
   if (!product) {
     return (

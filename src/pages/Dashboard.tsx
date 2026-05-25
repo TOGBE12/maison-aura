@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Order } from '../types';
+import { post, put, del } from '../api/client';
 import {
   Briefcase,
   Layers,
@@ -50,7 +51,9 @@ export const Dashboard: React.FC = () => {
     currentTheme,
     setThemeById,
     showToast,
-    stats
+    stats,
+    categories,
+    setCategories,
   } = useApp();
 
   // Internal routing states
@@ -63,13 +66,6 @@ export const Dashboard: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
-
-  // Categories state (persisted to localStorage)
-  const DEFAULT_CATEGORIES = ['Sacs de luxe', 'Sacs à main', 'Sacs de voyage', 'Sacs fashion', 'Sacs scolaires'];
-  const [categories, setCategories] = useState<string[]>(() => {
-    const saved = localStorage.getItem('mv_luxury_categories');
-    return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
-  });
 
   // Form states for creating/editing product
   const [prodName, setProdName] = useState('');
@@ -127,7 +123,7 @@ export const Dashboard: React.FC = () => {
       setProdPrice(290);
       setProdOldPrice('');
       setProdStock(10);
-      setProdDesc('Une nouvelle création de maroquinerie issue de l’Atelier MV LUXURY.');
+      setProdDesc('Une nouvelle création de au catalogue de l’Atelier MV LUXURY.');
       setProdColors(['#141414', '#e2ceb8']);
       setProdImageChosen(LUXURY_BAG_IMAGE_PRESETS[Math.floor(Math.random() * LUXURY_BAG_IMAGE_PRESETS.length)]);
       setProdCustomImageUrl('');
@@ -136,12 +132,31 @@ export const Dashboard: React.FC = () => {
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prodName || !prodDesc) return;
 
     if (editingProduct) {
-      // Modify active product inside products list
+      // Update via API
+      const apiId = parseInt(editingProduct.id) || editingProduct.id;
+      try {
+        await put(`/products/${apiId}`, {
+          name: prodName,
+          category_id: categories.indexOf(prodCategory) + 1 || 1,
+          price: prodPrice,
+          old_price: prodOldPrice ? Number(prodOldPrice) : null,
+          stock: prodStock,
+          description: prodDesc,
+          features: editingProduct.features,
+          specifications: {
+            ...editingProduct.specifications,
+            'Ref': prodCustomSku,
+          },
+          colors: prodColors.map(c => ({ hex_code: c, name: presetColorsList.find(pc => pc.hex === c)?.name || 'Couleur' })),
+          images: [prodImageChosen],
+        });
+      } catch {}
+
       setProducts(prev =>
         prev.map(p =>
           p.id === editingProduct.id
@@ -166,7 +181,31 @@ export const Dashboard: React.FC = () => {
       );
       showToast(`Le sac "${prodName}" a été actualisé dans le catalogue.`, 'success');
     } else {
-      // Create and inject a brand-new luxury model
+      // Create via API
+      try {
+        await post('/products', {
+          name: prodName,
+          description: prodDesc,
+          price: prodPrice,
+          old_price: prodOldPrice ? Number(prodOldPrice) : null,
+          stock: prodStock,
+          category_id: categories.indexOf(prodCategory) + 1 || 1,
+          features: [
+            'Cuir de vachette rigide sélectionné',
+            'Intérieur logoté toucher velours',
+            'Série numérotée poinçonnée'
+          ],
+          specifications: {
+            'Ref': prodCustomSku,
+            'Dimensions': '25 x 18 x 10 cm',
+            'Poids': '490g',
+            'Fermoir': 'Aimanté doré'
+          },
+          colors: prodColors.map(c => ({ hex_code: c, name: presetColorsList.find(pc => pc.hex === c)?.name || 'Couleur' })),
+          images: [prodImageChosen, LUXURY_BAG_IMAGE_PRESETS[1]],
+        });
+      } catch {}
+
       const nextId = 'bag_' + Date.now();
       const newBag: Product = {
         id: nextId,
@@ -201,10 +240,6 @@ export const Dashboard: React.FC = () => {
     setIsProductModalOpen(false);
   };
 
-  useEffect(() => {
-    localStorage.setItem('mv_luxury_categories', JSON.stringify(categories));
-  }, [categories]);
-
   const handleAddCategory = () => {
     const trimmed = newCategoryName.trim();
     if (!trimmed) {
@@ -221,8 +256,12 @@ export const Dashboard: React.FC = () => {
     showToast(`Catégorie "${trimmed}" ajoutée !`, 'success');
   };
 
-  const handleDeleteProduct = (productId: string, name: string) => {
+  const handleDeleteProduct = async (productId: string, name: string) => {
     if (window.confirm(`Voulez-vous vraiment retirer definitivement le sac "${name}" du catalogue de la boutique ?`)) {
+      const apiId = parseInt(productId) || productId;
+      try {
+        await del(`/products/${apiId}`);
+      } catch {}
       setProducts(prev => prev.filter(p => p.id !== productId));
       showToast(`Le modèle "${name}" a été définitivement retiré.`, 'info');
     }

@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem, Order, Review, User, ThemeType, AppTheme } from '../types';
 import { INITIAL_PRODUCTS, AVAILABLE_THEMES } from '../data/products';
+import { get, post, put, del, loginUser, registerUser } from '../api/client';
+import { mapProducts, mapOrders, mapReviews, mapCategories } from '../api/mappers';
 
 interface BackofficeStats {
   totalSales: number;
@@ -24,14 +26,16 @@ interface AppContextProps {
   updateCartQuantity: (productId: string, color: string, quantity: number) => void;
   clearCart: () => void;
   orders: Order[];
-  addOrder: (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>) => Order;
+  addOrder: (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   deleteOrder: (orderId: string) => void;
   reviews: Review[];
   addProductReview: (productId: string, userName: string, userEmail: string, rating: number, comment: string) => void;
+  fetchProductReviews: (productId: string) => Promise<void>;
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
-  login: (email: string, name: string, isAdmin: boolean) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   currentTheme: AppTheme;
   setThemeById: (id: ThemeType) => void;
@@ -49,237 +53,112 @@ interface AppContextProps {
   sortBy: string;
   setSortBy: (sort: string) => void;
   stats: BackofficeStats;
+  categories: string[];
+  setCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  loading: boolean;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
-// Core Seed Data for Orders
-const SEED_ORDERS: Order[] = [
-  {
-    id: 'MV-29471',
-    customerName: 'Clémence Dubois',
-    customerEmail: 'clemence.dubois@me.com',
-    customerPhone: '+213 6 45 89 23 11',
-    address: '14 Rue du Faubourg Saint-Honoré',
-    city: 'Paris',
-    postalCode: '75008',
-    items: [
-      {
-        productId: 'bag_1',
-        name: 'L’Aura Classique',
-        price: 950,
-        quantity: 1,
-        color: '#8c6239',
-        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800&auto=format&fit=crop'
-      }
-    ],
-    totalPrice: 950,
-    status: 'Livré',
-    paymentMethod: 'card',
-    createdAt: '2026-05-14T14:32:00Z'
-  },
-  {
-    id: 'MV-29472',
-    customerName: 'Sophie Martin',
-    customerEmail: 'sophie.martin@gmail.com',
-    customerPhone: '+213 7 12 34 56 78',
-    address: '8 Boulevard de la Croisette',
-    city: 'Cannes',
-    postalCode: '06400',
-    items: [
-      {
-        productId: 'bag_4',
-        name: 'Le Minuit Clutch',
-        price: 320,
-        quantity: 2,
-        color: '#141414',
-        image: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?q=80&w=800&auto=format&fit=crop'
-      }
-    ],
-    totalPrice: 640,
-    status: 'Expédié',
-    paymentMethod: 'card',
-    createdAt: '2026-05-16T10:15:00Z'
-  },
-  {
-    id: 'MV-29473',
-    customerName: 'Marc-Antoine de la Roche',
-    customerEmail: 'ma.roche@chateau.fr',
-    customerPhone: '+213 6 88 99 00 11',
-    address: 'Château du Clos, Route des Vins',
-    city: 'Bordeaux',
-    postalCode: '33000',
-    items: [
-      {
-        productId: 'bag_3',
-        name: 'L’Échappée Weekend',
-        price: 750,
-        quantity: 1,
-        color: '#5a3a1f',
-        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop'
-      }
-    ],
-    totalPrice: 750,
-    status: 'Confirmé',
-    paymentMethod: 'paypal',
-    createdAt: '2026-05-18T09:44:00Z'
-  },
-  {
-    id: 'MV-29474',
-    customerName: 'Léa Chevalier',
-    customerEmail: 'lea.chevalier@sciencespo.fr',
-    customerPhone: '+213 6 44 21 89 77',
-    address: '42 Rue des Écoles',
-    city: 'Paris',
-    postalCode: '75005',
-    items: [
-      {
-        productId: 'bag_7',
-        name: 'L’Aventurier Urbain',
-        price: 240,
-        quantity: 1,
-        color: '#3c3c3c',
-        image: 'https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop'
-      }
-    ],
-    totalPrice: 240,
-    status: 'En attente',
-    paymentMethod: 'delivery',
-    createdAt: '2026-05-19T11:20:00Z'
-  },
-  {
-    id: 'MV-29475',
-    customerName: 'Chloé Bernard',
-    customerEmail: 'chloe.bern@yahoo.fr',
-    customerPhone: '+213 7 98 76 54 32',
-    address: '12 Avenue des Alpes',
-    city: 'Chamonix',
-    postalCode: '74400',
-    items: [
-      {
-        productId: 'bag_2',
-        name: 'Le Cabas Horizon',
-        price: 490,
-        quantity: 1,
-        color: '#e2ceb8',
-        image: 'https://images.unsplash.com/photo-1605733513597-a8f8341084e6?q=80&w=800&auto=format&fit=crop'
-      },
-      {
-        productId: 'bag_6',
-        name: 'Le Studio Minimal',
-        price: 420,
-        quantity: 1,
-        color: '#a82020',
-        image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=800&auto=format&fit=crop'
-      }
-    ],
-    totalPrice: 910,
-    status: 'En attente',
-    paymentMethod: 'card',
-    createdAt: '2026-05-19T17:05:00Z'
-  }
-];
-
-// Core Seed Data for Reviews
-const SEED_REVIEWS: Review[] = [
-  {
-    id: 'rev_1',
-    productId: 'bag_1',
-    userName: 'Emilie R.',
-    userEmail: 'emilie@luxe.fr',
-    rating: 5,
-    comment: 'Un sac absolument divin. Le cuir sent divinement bon, les finitions sont irréprochables. On sent le savoir-faire de l’atelier. Le fermoir or brille magnifiquement.',
-    createdAt: '2026-05-10T08:00:00Z'
-  },
-  {
-    id: 'rev_2',
-    productId: 'bag_1',
-    userName: 'Camille L.',
-    userEmail: 'camille@luxury-world.com',
-    rating: 4,
-    comment: 'Très belle pièce, classe et intemporelle. Reçu élégamment emballé dans son coffret et pochon en satin. Légèrement plus petit en vrai que sur l’image mais merveilleux.',
-    createdAt: '2026-05-12T15:20:00Z'
-  },
-  {
-    id: 'rev_3',
-    productId: 'bag_2',
-    userName: 'Aurélie D.',
-    userEmail: 'aurelie.d@mac.com',
-    rating: 5,
-    comment: 'Mon sac de bureau quotidien. Spacieux, discret mais très premium. Mon macbook pro 13 s’y glisse sans forcer. Les coutures croisées sont superbes.',
-    createdAt: '2026-05-13T18:45:00Z'
-  },
-  {
-    id: 'rev_4',
-    productId: 'bag_8',
-    userName: 'Victoire P.',
-    userEmail: 'victoire.p@nice.fr',
-    rating: 5,
-    comment: 'Le clou du spectacle pour mes vacances ! Ce tressage est d’une finesse incroyable combiné à ce cuir jaune d’or somptueux. Un vrai coup de cœur.',
-    createdAt: '2026-05-18T12:00:00Z'
-  }
-];
-
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Products storage
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('mv_luxury_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
   });
 
-  // Cart storage
+  const [categories, setCategories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('mv_luxury_categories');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [cart, setCart] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('mv_luxury_cart');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Orders storage
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = localStorage.getItem('mv_luxury_orders');
-    return saved ? JSON.parse(saved) : SEED_ORDERS;
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Reviews storage
   const [reviews, setReviews] = useState<Review[]>(() => {
     const saved = localStorage.getItem('mv_luxury_reviews');
-    return saved ? JSON.parse(saved) : SEED_REVIEWS;
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // User auth state (Simulated: administrator login out-of-the-box makes checking easy)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('mv_luxury_user');
-    if (saved) return JSON.parse(saved);
-    // Default to admin so it is ready to analyze right away, or they can toggle back.
-    return {
-      id: 'usr_admin',
-      name: 'Marilyn (Vendeuse)',
-      email: 'marilyn@mvluxury.com',
-      isAdmin: true,
-      createdAt: '2026-01-01T00:00:00Z'
-    };
+    const savedToken = localStorage.getItem('mv_luxury_token');
+    if (saved && savedToken) return JSON.parse(saved);
+    return null;
   });
 
-  // Theme selection
   const [themeId, setThemeId] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('mv_luxury_theme');
     return (saved as ThemeType) || 'aura-luxe';
   });
 
-  // Setup Routing based on URL hashes `#home`, `#shop`, etc.
   const [customRoute, setCustomRoute] = useState<{ page: string; params: Record<string, string> }>(() => {
     return parseHash(window.location.hash);
   });
 
-  // Notification Toast state
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  // Filtering and sorting state for Shop Page
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tous');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1500]);
   const [sortBy, setSortBy] = useState('popularité');
 
-  // Persistence hooks
+  // Fetch initial data from API
+  useEffect(() => {
+    async function fetchInitialData() {
+      try {
+        const [productsData, categoriesData] = await Promise.all([
+          get<{ products: any[] }>('/products'),
+          get<{ categories: any[] }>('/categories'),
+        ]);
+        if (productsData.products?.length) {
+          const mapped = mapProducts(productsData.products);
+          setProducts(mapped);
+          localStorage.setItem('mv_luxury_products', JSON.stringify(mapped));
+        }
+        if (categoriesData.categories?.length) {
+          const mapped = mapCategories(categoriesData.categories);
+          setCategories(mapped);
+          localStorage.setItem('mv_luxury_categories', JSON.stringify(mapped));
+        }
+      } catch {
+        // Silently fall back to localStorage/seed data
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchInitialData();
+  }, []);
+
+  // Fetch orders if user is logged in
+  useEffect(() => {
+    if (!currentUser) return;
+    const token = localStorage.getItem('mv_luxury_token');
+    if (!token) return;
+
+    async function fetchOrders() {
+      try {
+        const data = await get<{ orders: any[] }>('/orders');
+        if (data.orders?.length) {
+          const mapped = mapOrders(data.orders);
+          setOrders(mapped);
+          localStorage.setItem('mv_luxury_orders', JSON.stringify(mapped));
+        }
+      } catch {
+        // Fall back to localStorage
+      }
+    }
+    fetchOrders();
+  }, [currentUser]);
+
+  // Persist products to localStorage
   useEffect(() => {
     localStorage.setItem('mv_luxury_products', JSON.stringify(products));
   }, [products]);
@@ -301,6 +180,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('mv_luxury_user', JSON.stringify(currentUser));
     } else {
       localStorage.removeItem('mv_luxury_user');
+      localStorage.removeItem('mv_luxury_token');
     }
   }, [currentUser]);
 
@@ -308,7 +188,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('mv_luxury_theme', themeId);
   }, [themeId]);
 
-  // Read theme object by ID
+  useEffect(() => {
+    localStorage.setItem('mv_luxury_categories', JSON.stringify(categories));
+  }, [categories]);
+
   const currentTheme = AVAILABLE_THEMES.find(t => t.id === themeId) || AVAILABLE_THEMES[0];
 
   const setThemeById = (id: ThemeType) => {
@@ -316,7 +199,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Thème changé : ${AVAILABLE_THEMES.find(t => t.id === id)?.name}`, 'info');
   };
 
-  // Parsing helper for Hash URL
   function parseHash(hash: string) {
     if (!hash || hash === '#') {
       return { page: 'home', params: {} };
@@ -333,7 +215,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { page: path, params };
   }
 
-  // Monitor hash changes for back/forward buttons
   useEffect(() => {
     const handleHashChange = () => {
       setCustomRoute(parseHash(window.location.hash));
@@ -343,7 +224,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Custom router function
   const navigateTo = (page: string, params?: Record<string, string>) => {
     let query = '';
     if (params && Object.keys(params).length > 0) {
@@ -354,7 +234,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.location.hash = `${page}${query}`;
   };
 
-  // Toast System
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
     setToasts((prev) => [...prev, { id, message, type }]);
@@ -367,7 +246,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Cart Logic
   const addToCart = (product: Product, quantity: number, color: string) => {
     if (product.stock <= 0) {
       showToast('Ce produit est actuellement en rupture de stock.', 'error');
@@ -429,8 +307,56 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCart([]);
   };
 
-  // Orders Logic
-  const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>): Order => {
+  const addOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>): Promise<Order> => {
+    const token = localStorage.getItem('mv_luxury_token');
+
+    try {
+      if (token) {
+        const payload = {
+          customer_name: orderData.customerName,
+          customer_email: orderData.customerEmail,
+          customer_phone: orderData.customerPhone,
+          address: orderData.address,
+          city: orderData.city,
+          postal_code: orderData.postalCode,
+          subtotal: orderData.totalPrice,
+          tax_amount: Math.round(orderData.totalPrice * 0.05 * 100) / 100,
+          shipping_cost: orderData.totalPrice >= 300 ? 0 : 25,
+          discount_amount: 0,
+          total_price: orderData.totalPrice,
+          payment_method: orderData.paymentMethod,
+          items: orderData.items.map(item => ({
+            product_id: parseInt(item.productId) || item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            color: item.color,
+            image: item.image,
+          })),
+        };
+        const response = await post<{ order: any; message?: string }>('/orders', payload);
+        if (response.order) {
+          const mapped = mapOrders([response.order]);
+          const newOrder = mapped[0];
+          setOrders((prev) => [newOrder, ...prev]);
+          setProducts((prevProducts) => {
+            return prevProducts.map((p) => {
+              const orderItem = orderData.items.find((item) => item.productId === p.id);
+              if (orderItem) {
+                const refinedStock = Math.max(0, p.stock - orderItem.quantity);
+                return { ...p, stock: refinedStock };
+              }
+              return p;
+            });
+          });
+          showToast(`Commande ${newOrder.id} enregistrée avec succès !`, 'success');
+          return newOrder;
+        }
+      }
+    } catch {
+      // Fall back to local order creation
+    }
+
     const nextId = 'MV-' + Math.floor(10000 + Math.random() * 90000);
     const newOrder: Order = {
       ...orderData,
@@ -440,8 +366,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setOrders((prev) => [newOrder, ...prev]);
-
-    // Fast subtract stock
     setProducts((prevProducts) => {
       return prevProducts.map((p) => {
         const orderItem = orderData.items.find((item) => item.productId === p.id);
@@ -457,10 +381,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newOrder;
   };
 
-  const updateOrderStatus = (orderId: string, status: Order['status']) => {
+  const updateOrderStatus = async (orderId: string, status: Order['status']) => {
+    const token = localStorage.getItem('mv_luxury_token');
+
     setOrders((prev) =>
       prev.map((ord) => (ord.id === orderId ? { ...ord, status } : ord))
     );
+
+    if (token) {
+      try {
+        await put(`/orders/${encodeURIComponent(orderId)}`, { status });
+      } catch {
+        // Revert on error would be complex; just show toast
+      }
+    }
+
     showToast(`Le statut de la commande ${orderId} est désormais: ${status}`, 'success');
   };
 
@@ -469,8 +404,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Commande ${orderId} effacée du système.`, 'info');
   };
 
-  // Reviews Logic
-  const addProductReview = (productId: string, userName: string, userEmail: string, rating: number, comment: string) => {
+  const fetchProductReviews = async (productId: string) => {
+    try {
+      const apiId = parseInt(productId);
+      if (!isNaN(apiId)) {
+        const data = await get<{ reviews: any[] }>(`/products/${apiId}/reviews`);
+        if (data.reviews?.length) {
+          const mapped = mapReviews(data.reviews);
+          setReviews((prev) => {
+            const filtered = prev.filter(r => r.productId !== productId);
+            return [...filtered, ...mapped];
+          });
+        }
+      }
+    } catch {
+      // Keep existing reviews
+    }
+  };
+
+  const addProductReview = async (productId: string, userName: string, userEmail: string, rating: number, comment: string) => {
     const newReview: Review = {
       id: 'rev_' + Date.now().toString(),
       productId,
@@ -483,7 +435,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setReviews((prev) => [newReview, ...prev]);
 
-    // Update Average Rating of product
     setProducts((prevProds) => {
       return prevProds.map((p) => {
         if (p.id === productId) {
@@ -499,26 +450,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Votre avis précieux a été publié.', 'success');
   };
 
-  // Login/Register
-  const login = (email: string, name: string, isAdmin: boolean) => {
-    setCurrentUser({
-      id: 'usr_' + Date.now(),
-      name,
-      email,
-      isAdmin,
-      createdAt: new Date().toISOString()
-    });
-    showToast(`Bienvenue de retour, ${name}`, 'success');
-    return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await loginUser(email, password);
+      localStorage.setItem('mv_luxury_token', response.token);
+      setCurrentUser({
+        id: String(response.user.id),
+        name: response.user.name,
+        email: response.user.email,
+        isAdmin: response.user.is_admin,
+        createdAt: response.user.created_at,
+      });
+      showToast(`Bienvenue de retour, ${response.user.name}`, 'success');
+      return true;
+    } catch {
+      showToast('Email ou mot de passe incorrect.', 'error');
+      return false;
+    }
+  };
+
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await registerUser(name, email, password);
+      localStorage.setItem('mv_luxury_token', response.token);
+      setCurrentUser({
+        id: String(response.user.id),
+        name: response.user.name,
+        email: response.user.email,
+        isAdmin: response.user.is_admin,
+        createdAt: response.user.created_at,
+      });
+      showToast(`Bienvenue, ${response.user.name} !`, 'success');
+      return true;
+    } catch {
+      showToast('Erreur lors de l\'inscription.', 'error');
+      return false;
+    }
   };
 
   const logout = () => {
     setCurrentUser(null);
+    localStorage.removeItem('mv_luxury_token');
     showToast('Vous êtes déconnecté.', 'info');
     navigateTo('home');
   };
 
-  // Computed Dash Stats
   const [stats, setStats] = useState<BackofficeStats>({
     totalSales: 0,
     totalOrdersCount: 0,
@@ -531,7 +507,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const totalSalesSum = paidOrders.reduce((sum, o) => sum + o.totalPrice, 0);
     const lowStockItems = products.filter((p) => p.stock <= 3).length;
 
-    // Monthly calculations
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -548,7 +523,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalSales: totalSalesSum,
       totalOrdersCount: orders.length,
       lowStockCount: lowStockItems,
-      monthlyRevenue: currentMonthSales || totalSalesSum * 0.4 // default simulation fallback
+      monthlyRevenue: currentMonthSales || totalSalesSum * 0.4
     });
   }, [orders, products]);
 
@@ -568,9 +543,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteOrder,
         reviews,
         addProductReview,
+        fetchProductReviews,
         currentUser,
         setCurrentUser,
         login,
+        register,
         logout,
         currentTheme,
         setThemeById,
@@ -587,7 +564,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPriceRange,
         sortBy,
         setSortBy,
-        stats
+        stats,
+        categories,
+        setCategories,
+        loading,
       }}
     >
       {children}

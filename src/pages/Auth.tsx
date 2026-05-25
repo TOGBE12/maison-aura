@@ -4,70 +4,64 @@ import { Mail, Lock, User, Key, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const Auth: React.FC = () => {
-  const { login, navigateTo, showToast } = useApp();
+  const { login, register, navigateTo, showToast } = useApp();
   const [formType, setFormType] = useState<'login' | 'register' | 'forgot'>('login');
+  const [submitting, setSubmitting] = useState(false);
 
-  // Input States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [isAdminRole, setIsAdminRole] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
 
-    if (formType === 'login') {
-      if (!email || !password) {
-        showToast('Veuillez compléter l’adresse email et le mot de passe.', 'error');
-        return;
-      }
-      
-      // Handle login bypass or check admin credentials
-      const determineIsAdmin = email.includes('admin') || email.includes('marilyn') || isAdminRole;
-      const finalName = determineIsAdmin ? 'Marilyn Aura (Vendeuse)' : name || 'Client Privilégié';
-      login(email, finalName, determineIsAdmin);
-      
-      if (determineIsAdmin) {
-        navigateTo('dashboard');
+    try {
+      if (formType === 'login') {
+        if (!email || !password) {
+          showToast('Veuillez compléter l\'adresse email et le mot de passe.', 'error');
+          setSubmitting(false);
+          return;
+        }
+        const success = await login(email, password);
+        if (success) {
+          const isAdmin = email.includes('admin') || email.includes('marilyn');
+          navigateTo(isAdmin ? 'dashboard' : 'home');
+        }
+      } else if (formType === 'register') {
+        if (!name || !email || !password) {
+          showToast('Veuillez compléter l\'intégralité des saisies d\'inscription.', 'error');
+          setSubmitting(false);
+          return;
+        }
+        const success = await register(name, email, password);
+        if (success) {
+          navigateTo('home');
+        }
       } else {
-        navigateTo('home');
+        if (!email) {
+          showToast('Veuillez indiquer votre adresse email.', 'error');
+          setSubmitting(false);
+          return;
+        }
+        showToast(`Instructions de renouvellement de mot de passe transmises à ${email}.`, 'success');
+        setFormType('login');
       }
-    } else if (formType === 'register') {
-      if (!name || !email || !password) {
-        showToast('Veuillez compléter l’intégralité des saisies d’inscription.', 'error');
-        return;
-      }
-      login(email, name, isAdminRole);
-      
-      if (isAdminRole) {
-        navigateTo('dashboard');
-      } else {
-        navigateTo('home');
-      }
-    } else {
-      // Forgot password trigger
-      if (!email) {
-        showToast('Veuillez indiquer votre adresse email.', 'error');
-        return;
-      }
-      showToast(`Instructions de renouvellement de mot de passe transmises à ${email}.`, 'success');
-      setFormType('login');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Helper shortcuts for quick testing evaluations
   const handleQuickRolesPreFill = (role: 'admin' | 'buyer') => {
     if (role === 'admin') {
       setEmail('marilyn@maisonaura.com');
-      setPassword('••••••••');
+      setPassword('password');
       setName('Marilyn Aura');
-      setIsAdminRole(true);
       showToast('Identifiants administrateur de la boutique pré-remplis.', 'info');
     } else {
       setEmail('acheteuse.luxe@voila.fr');
-      setPassword('•••••••');
+      setPassword('password');
       setName('Clarisse de Beaupré');
-      setIsAdminRole(false);
       showToast('Identifiants acheteuse cliente pré-remplis.', 'info');
     }
   };
@@ -81,7 +75,6 @@ export const Auth: React.FC = () => {
         className="w-full bg-white p-6 md:p-8 rounded-2xl border border-neutral-100 shadow-xl"
       >
         
-        {/* Top Header details */}
         <div className="text-center mb-8">
           <span className="text-[10px] tracking-[0.3em] font-mono text-[#BF986B] uppercase font-bold">
             CLUB PRIVILEGE MV LUXURY
@@ -92,16 +85,14 @@ export const Auth: React.FC = () => {
             {formType === 'forgot' && 'Accès Perdu'}
           </h1>
           <p className="text-xs text-neutral-400 mt-2 font-sans">
-            {formType === 'login' && 'Entrez votre code ou connectez-vous par courriel.'}
+            {formType === 'login' && 'Connectez-vous avec votre email et mot de passe.'}
             {formType === 'register' && 'Inscrivez-vous pour obtenir les invitations exclusives.'}
             {formType === 'forgot' && 'Indiquez votre adresse pour réinitialiser le mot de passe.'}
           </p>
         </div>
 
-        {/* Form Inputs and layout */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           
-          {/* S’enregistrer name details */}
           {formType === 'register' && (
             <div className="flex flex-col gap-1.5">
               <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
@@ -121,7 +112,6 @@ export const Auth: React.FC = () => {
             </div>
           )}
 
-          {/* Mail address parameter */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
               Adresse Électronique
@@ -139,7 +129,6 @@ export const Auth: React.FC = () => {
             </div>
           </div>
 
-          {/* Secure password parameter */}
           {formType !== 'forgot' && (
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
@@ -170,34 +159,17 @@ export const Auth: React.FC = () => {
             </div>
           )}
 
-          {/* Interactive Administrator toggle indicator during registration / login */}
-          {formType !== 'forgot' && (
-            <div className="flex items-center gap-2.5 my-1 bg-neutral-50 p-2.5 rounded-xl border border-neutral-100/50">
-              <input
-                type="checkbox"
-                id="admin-profile-toggle"
-                checked={isAdminRole}
-                onChange={(e) => setIsAdminRole(e.target.checked)}
-                className="w-4 h-4 text-neutral-800 rounded outline-none border-neutral-300 accent-neutral-900 cursor-pointer"
-              />
-              <label htmlFor="admin-profile-toggle" className="text-[10px] text-neutral-600 font-mono uppercase tracking-wider font-semibold cursor-pointer">
-                Activer les droits Administrateur (Vendeuse)
-              </label>
-            </div>
-          )}
-
-          {/* Action trigger button */}
           <button
             type="submit"
-            className="mt-3.5 py-3.5 bg-neutral-900 hover:bg-[#BF986B] text-white text-[10px] font-mono uppercase font-bold tracking-[0.2em] rounded-xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+            disabled={submitting}
+            className="mt-3.5 py-3.5 bg-neutral-900 hover:bg-[#BF986B] text-white text-[10px] font-mono uppercase font-bold tracking-[0.2em] rounded-xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:opacity-50"
             id="auth-form-submit"
           >
-            {formType === 'login' ? 'Entrer dans la Maison' : 'Rejoindre l’Atelier'}
+            {submitting ? 'Connexion...' : formType === 'login' ? 'Entrer dans la Maison' : 'Rejoindre l\'Atelier'}
             <ArrowRight size={12} />
           </button>
         </form>
 
-        {/* Change auth mode links */}
         <div className="text-center mt-6 pt-5 border-t border-neutral-100 text-[11px] text-neutral-500 font-sans">
           {formType === 'login' && (
             <p>
@@ -233,7 +205,6 @@ export const Auth: React.FC = () => {
           )}
         </div>
 
-        {/* QUICK SIMULATION COMPONENT (Highly practical to test roles in seconds!) */}
         <div className="mt-8 bg-[#FAF8F5] border border-neutral-200/50 p-4 rounded-xl">
           <p className="text-[9px] text-neutral-400 font-mono uppercase tracking-widest text-center font-bold mb-3">
             Accès rapide de démonstration
@@ -258,7 +229,6 @@ export const Auth: React.FC = () => {
           </div>
         </div>
 
-        {/* Corporate secure validation badge */}
         <div className="flex justify-center items-center gap-1.5 mt-6 text-[10px] text-neutral-400 font-sans font-medium">
           <ShieldCheck size={12} className="text-[#BF986B]" />
           <span>Charte de protection des données SSL activée</span>

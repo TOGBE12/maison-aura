@@ -24,9 +24,14 @@ export const Footer: React.FC = () => {
           
           {/* Brand Philosophy */}
           <div className="md:col-span-1 flex flex-col gap-4">
+            <img
+              src="/src/IMG-20260521-WA0056.jpg"
+              alt="MV LUXURY"
+              className="w-16 h-16 rounded-xl object-cover"
+            />
             <h3 className="font-serif text-2xl tracking-[0.25em] font-light">MV LUXURY</h3>
             <p className="text-xs text-neutral-400 mt-2 leading-relaxed font-sans max-w-sm">
-              Artisanat d’exception, matières rigoureusement sélectionnées et designs sculpturaux. Notre vision de la haute maroquinerie transcende les générations.
+              Artisanat d'exception, matières rigoureusement sélectionnées et designs sculpturaux. Notre vision de la haute maroquinerie transcende les générations.
             </p>
             <div className="flex items-center gap-3 mt-4 text-neutral-400">
               <a href="#" className="hover:text-white transition-colors p-1" title="Instagram">
@@ -92,18 +97,11 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom copyright & payment icons */}
+        {/* Bottom copyright */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-10 text-[10px] text-neutral-500 font-sans tracking-widest uppercase">
           <p>
             MV LUXURY © {new Date().getFullYear()}. Confectionné de manière éthique et durable.
           </p>
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <span>Visa</span>
-            <span>Mastercard</span>
-            <span>Apple Pay</span>
-            <span>Paypal</span>
-            <span className="text-[#BF986B]">Artisanat Certifié</span>
-          </div>
         </div>
       </div>
     </footer>
