@@ -26,12 +26,8 @@ export const Checkout: React.FC = () => {
   const [city, setCity] = useState('');
   const [postal, setPostal] = useState('');
 
-  // Payment states
-  const [payMethod, setPayMethod] = useState<'card' | 'paypal' | 'delivery'>('card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCVV, setCardCVV] = useState('');
+  // Payment method
+  const [payMethod] = useState<'delivery'>('delivery');
 
   // Coupon states
   const [couponCode, setCouponCode] = useState('');
@@ -53,10 +49,10 @@ export const Checkout: React.FC = () => {
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    if (couponCode.toUpperCase() === 'AURA10') {
+    if (couponCode.toUpperCase() === 'MV10') {
       setIsCouponApplied(true);
       setDiscountMultiplier(0.9); // 10%
-      showToast('Code promo "AURA10" appliqué : 10% de réduction immédiate !', 'success');
+      showToast('Code promo "MV10" appliqué : 10% de réduction immédiate !', 'success');
     } else {
       showToast('Ce code de réduction n’existe pas.', 'error');
     }
@@ -69,12 +65,7 @@ export const Checkout: React.FC = () => {
       return;
     }
 
-    if (payMethod === 'card' && (!cardNumber || !cardHolder || !cardExpiry || !cardCVV)) {
-      showToast('Veuillez compléter vos coordonnées bancaires.', 'error');
-      return;
-    }
-
-    // Prepare simulated items schema structure
+    // Prepare items schema structure
     const orderItems = cart.map((item) => ({
       productId: item.product.id,
       name: item.product.name,
@@ -170,7 +161,7 @@ export const Checkout: React.FC = () => {
                   </label>
                   <input
                     type="tel"
-                    placeholder="+33 6 12 34 56 78"
+                    placeholder="+213 6 12 34 56 78"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="bg-[#FAF8F5]/50 border text-xs px-3.5 py-2.5 rounded-xl outline-none focus:border-neutral-900"
@@ -224,55 +215,32 @@ export const Checkout: React.FC = () => {
               </div>
             </div>
 
-            {/* Simulated Payments Card Selection */}
+            {/* Paiement à la livraison */}
             <div className="bg-white p-6 md:p-8 rounded-2xl border border-neutral-100 shadow-sm flex flex-col gap-4">
               <h2 className="font-serif text-lg uppercase tracking-wide text-neutral-800 border-b border-neutral-100 pb-3">
-                02 • Solution de règlement confidentielle
+                02 • Mode de paiement
               </h2>
-
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setPayMethod('card')}
-                  className={`py-3.5 border rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all text-xs font-semibold cursor-pointer ${
-                    payMethod === 'card'
-                      ? 'border-neutral-950 bg-neutral-900 text-white'
-                      : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-900'
-                  }`}
-                  id="pay-choice-card"
-                >
-                  <CreditCard size={16} />
-                  Carte Bancaire
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setPayMethod('paypal')}
-                  className={`py-3.5 border rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all text-xs font-semibold cursor-pointer ${
-                    payMethod === 'paypal'
-                      ? 'border-neutral-950 bg-neutral-900 text-white'
-                      : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-900'
-                  }`}
-                  id="pay-choice-paypal"
-                >
-                  <span className="font-mono italic font-bold text-sm tracking-tighter">PP</span>
-                  Paypal Secure
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setPayMethod('delivery')}
-                  className={`py-3.5 border rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all text-xs font-semibold cursor-pointer ${
-                    payMethod === 'delivery'
-                      ? 'border-neutral-950 bg-neutral-900 text-white'
-                      : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-905'
-                  }`}
-                  id="pay-choice-delivery"
-                >
-                  🚚
-                  Contre Remboursement
-                </button>
+              <div className="p-6 bg-amber-50/60 rounded-xl border border-amber-200/60 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📦</span>
+                  <div>
+                    <h3 className="font-serif text-base font-semibold text-neutral-800">Paiement à la livraison</h3>
+                    <p className="text-xs text-neutral-500 font-sans mt-0.5">
+                      Vous réglez directement à la réception de votre commande
+                    </p>
+                  </div>
+                </div>
+                <div className="text-xs text-neutral-600 font-sans leading-relaxed pl-11">
+                  Notre livreur privé se présentera à l'adresse indiquée avec votre écrin scellé. 
+                  Vous pourrez inspecter votre article avant de procéder au paiement en espèces 
+                  ou par carte bancaire. Aucun frais supplémentaire.
+                </div>
+                <div className="pl-11 flex items-center gap-2 text-[10px] text-emerald-700 font-mono font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Option sélectionnée par défaut
+                </div>
               </div>
+            </div>
 
               {/* Collapsible banking validation fields */}
               <AnimatePresence mode="wait">
@@ -454,7 +422,7 @@ export const Checkout: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <span className="font-mono font-bold shrink-0">{item.product.price * item.quantity}€</span>
+                <span className="font-mono font-bold shrink-0">{item.product.price * item.quantity} DZD</span>
               </div>
             ))}
           </div>
@@ -467,7 +435,7 @@ export const Checkout: React.FC = () => {
             <form onSubmit={handleApplyCoupon} className="flex gap-1.5">
               <input
                 type="text"
-                placeholder="Ex: AURA10 (10% de réduction)"
+                placeholder="Ex: MV10 (10% de réduction)"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value)}
                 disabled={isCouponApplied}
@@ -483,7 +451,7 @@ export const Checkout: React.FC = () => {
             </form>
             {isCouponApplied && (
               <p className="text-[10px] text-emerald-600 font-mono mt-2 font-semibold">
-                ✓ Code de réduction AURA10 appliqué (-10% sur les articles) !
+                ✓ Code de réduction MV10 appliqué (-10% sur les articles) !
               </p>
             )}
           </div>
@@ -492,19 +460,19 @@ export const Checkout: React.FC = () => {
           <div className="border-t border-neutral-200 pt-5 flex flex-col gap-3.5 font-mono text-xs text-neutral-600">
             <div className="flex justify-between">
               <span>Sous-total boutique :</span>
-              <span>{subtotal}€</span>
+              <span>{subtotal} DZD</span>
             </div>
 
             {isCouponApplied && (
               <div className="flex justify-between text-emerald-600">
                 <span>Remise privilège (10%) :</span>
-                <span>-{discountAmount}€</span>
+                <span>-{discountAmount} DZD</span>
               </div>
             )}
 
             <div className="flex justify-between">
               <span>Assurances & Taxes (5%) :</span>
-              <span>{taxAmount}€</span>
+              <span>{taxAmount} DZD</span>
             </div>
 
             <div className="flex justify-between">
@@ -512,13 +480,13 @@ export const Checkout: React.FC = () => {
               {deliveryExpense === 0 ? (
                 <span className="text-emerald-600 font-bold uppercase tracking-wider text-[10px]">Offerte</span>
               ) : (
-                <span>{deliveryExpense}€</span>
+                <span>{deliveryExpense} DZD</span>
               )}
             </div>
 
             <div className="flex justify-between text-neutral-800 font-bold text-sm border-t border-neutral-100 pt-3">
               <span>Versement final :</span>
-              <span className="text-xl text-neutral-900">{finalPrice}€</span>
+              <span className="text-xl text-neutral-900">{finalPrice} DZD</span>
             </div>
           </div>
 

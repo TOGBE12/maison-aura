@@ -175,11 +175,11 @@ export const ProductDetails: React.FC = () => {
           <div className="flex items-center gap-3 border-b border-neutral-100 pb-5">
             {product.oldPrice && (
               <span className="text-neutral-400 font-mono text-base line-through">
-                {product.oldPrice}€
+                {product.oldPrice} DZD
               </span>
             )}
             <span className="text-3xl font-mono font-bold text-neutral-800">
-              {product.price}€
+              {product.price} DZD
             </span>
             {product.isPromo && (
               <span className="bg-[#BF986B]/15 text-[#BF986B] border border-[#BF986B]/30 px-2.5 py-0.5 text-[8px] uppercase tracking-widest font-mono font-bold rounded-full">
@@ -531,7 +531,7 @@ export const ProductDetails: React.FC = () => {
                   {p.name}
                 </h4>
                 <p className="text-xs text-[#BF986B] font-mono leading-none">
-                  {p.price}€
+                  {p.price} DZD
                 </p>
               </div>
             ))}
@@ -580,7 +580,7 @@ export const ProductDetails: React.FC = () => {
               <div className="absolute bottom-4 inset-x-4 bg-neutral-900/85 backdrop-blur-md p-4 text-center text-white rounded-xl">
                 <p className="font-serif text-sm uppercase font-light tracking-wide">{product.name}</p>
                 <p className="text-[10px] text-neutral-300 font-mono tracking-widest mt-0.5">
-                  Finition {activeColorName} • {product.price}€
+                  Finition {activeColorName} • {product.price} DZD
                 </p>
               </div>
             </motion.div>

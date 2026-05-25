@@ -169,11 +169,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex items-center gap-1.5 font-mono text-xs font-bold shrink-0">
             {product.oldPrice && (
               <span className="text-neutral-400 line-through text-[11px] font-normal">
-                {product.oldPrice}€
+                {product.oldPrice} DZD
               </span>
             )}
             <span className="text-neutral-800 font-bold shrink-0">
-              {product.price}€
+              {product.price} DZD
             </span>
           </div>
         </div>

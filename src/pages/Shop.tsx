@@ -197,11 +197,11 @@ export const Shop: React.FC = () => {
                     Prix maximum accordé
                   </span>
                   <span className="text-xs font-mono font-bold text-neutral-800">
-                    {priceRange[1]}€
+                    {priceRange[1]} DZD
                   </span>
                 </div>
                 <div className="mt-4 flex items-center gap-3">
-                  <span className="text-[11px] font-mono text-neutral-400">0€</span>
+                  <span className="text-[11px] font-mono text-neutral-400">0 DZD</span>
                   <input
                     type="range"
                     min="0"
@@ -214,7 +214,7 @@ export const Shop: React.FC = () => {
                     }}
                     className="w-full accent-neutral-850 h-1 bg-neutral-200 rounded-lg cursor-pointer"
                   />
-                  <span className="text-[11px] font-mono text-neutral-400">{maxAvailableProductPrice}€</span>
+                  <span className="text-[11px] font-mono text-neutral-400">{maxAvailableProductPrice} DZD</span>
                 </div>
               </div>
 

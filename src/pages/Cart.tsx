@@ -142,10 +142,10 @@ export const Cart: React.FC = () => {
                     {/* Pricing */}
                     <div className="flex flex-col text-right font-mono min-w-[70px]">
                       <span className="text-xs font-bold text-neutral-800">
-                        {productTotal}€
+                        {productTotal} DZD
                       </span>
                       <span className="text-[9px] text-neutral-400">
-                        ({item.product.price}€ / u)
+                        ({item.product.price} DZD / u)
                       </span>
                     </div>
 
@@ -179,12 +179,12 @@ export const Cart: React.FC = () => {
 
               <div className="flex justify-between text-neutral-600">
                 <span>Sous-total articles :</span>
-                <span className="font-semibold">{subtotal}€</span>
+                <span className="font-semibold">{subtotal} DZD</span>
               </div>
 
               <div className="flex justify-between text-neutral-600">
                 <span>Assurances & Taxes d'art (5%) :</span>
-                <span className="font-semibold">{ecoTaxes}€</span>
+                <span className="font-semibold">{ecoTaxes} DZD</span>
               </div>
 
               <div className="flex justify-between text-neutral-600">
@@ -194,13 +194,13 @@ export const Cart: React.FC = () => {
                     Offerte (Aura Privé)
                   </span>
                 ) : (
-                  <span className="font-semibold">{shippingCharge}€</span>
+                  <span className="font-semibold">{shippingCharge} DZD</span>
                 )}
               </div>
 
               {shippingCharge > 0 && (
                 <p className="text-[10px] text-[#BF986B] font-sans leading-relaxed pt-1 select-none">
-                  💡 Ajoutez encore {300 - subtotal}€ de maroquinerie pour obtenir la <strong>livraison privée express gratuite</strong> !
+                  💡 Ajoutez encore {300 - subtotal} DZD de maroquinerie pour obtenir la <strong>livraison privée express gratuite</strong> !
                 </p>
               )}
             </div>
@@ -209,7 +209,7 @@ export const Cart: React.FC = () => {
             <div className="flex justify-between items-center font-mono text-sm uppercase tracking-wider">
               <span className="font-bold text-neutral-800">Estimation totale :</span>
               <span className="text-2xl font-black text-neutral-900">
-                {totalAmount + ecoTaxes}€
+                {totalAmount + ecoTaxes} DZD
               </span>
             </div>
 

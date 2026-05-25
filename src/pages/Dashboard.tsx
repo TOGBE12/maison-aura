@@ -71,7 +71,8 @@ export const Dashboard: React.FC = () => {
   const [prodDesc, setProdDesc] = useState('');
   const [prodColors, setProdColors] = useState<string[]>(['#141414', '#e2ceb8']);
   const [prodImageChosen, setProdImageChosen] = useState(LUXURY_BAG_IMAGE_PRESETS[0]);
-  const [prodCustomSku, setProdCustomSku] = useState('M-AURA-99201');
+  const [prodCustomImageUrl, setProdCustomImageUrl] = useState('');
+  const [prodCustomSku, setProdCustomSku] = useState('M-MV-99201');
 
   // Multi-input helpers for presets colors click
   const presetColorsList = [
@@ -108,7 +109,8 @@ export const Dashboard: React.FC = () => {
       setProdDesc(productToEdit.description);
       setProdColors(productToEdit.colors);
       setProdImageChosen(productToEdit.images[0] || LUXURY_BAG_IMAGE_PRESETS[0]);
-      setProdCustomSku(productToEdit.specifications['Ref'] || 'M-AURA-' + Math.floor(10000 + Math.random() * 90000));
+      setProdCustomImageUrl('');
+      setProdCustomSku(productToEdit.specifications['Ref'] || 'M-MV-' + Math.floor(10000 + Math.random() * 90000));
     } else {
       setEditingProduct(null);
       setProdName('');
@@ -119,6 +121,7 @@ export const Dashboard: React.FC = () => {
       setProdDesc('Une nouvelle création de maroquinerie issue de l’Atelier MV LUXURY.');
       setProdColors(['#141414', '#e2ceb8']);
       setProdImageChosen(LUXURY_BAG_IMAGE_PRESETS[Math.floor(Math.random() * LUXURY_BAG_IMAGE_PRESETS.length)]);
+      setProdCustomImageUrl('');
       setProdCustomSku('M-MV-' + Math.floor(10000 + Math.random() * 90000));
     }
     setIsProductModalOpen(true);
@@ -276,7 +279,7 @@ export const Dashboard: React.FC = () => {
             id="sidemenu-products"
           >
             <Layers size={16} />
-            {!isSidebarCollapsed && <span>Maroquinerie</span>}
+            {!isSidebarCollapsed && <span>Catégorie</span>}
           </button>
           
           <button
@@ -334,7 +337,7 @@ export const Dashboard: React.FC = () => {
             id="sidemenu-revenue"
           >
             <TrendingUp size={16} />
-            {!isSidebarCollapsed && <span>Recettes</span>}
+            {!isSidebarCollapsed && <span>Caisse</span>}
           </button>
           
           <button
@@ -403,10 +406,10 @@ export const Dashboard: React.FC = () => {
             {['overview', 'products', 'stock', 'orders', 'revenue', 'settings'].map((view) => {
               const labels: Record<string, string> = {
                 overview: 'Synthèse',
-                products: 'Catalogue Maroquinerie',
+                products: 'Catalogue Catégorie',
                 stock: 'Gestion des Stocks',
                 orders: 'Bordereaux Expéditions',
-                revenue: 'Chiffre d’Affaires',
+                revenue: 'Caisse',
                 settings: 'Configurations boutique'
               };
               return (
@@ -464,7 +467,7 @@ export const Dashboard: React.FC = () => {
                   <TrendingUp size={16} className="text-[#BF986B]" />
                 </div>
                 <div className="mt-4">
-                  <h3 className="text-2xl font-mono font-black text-neutral-900">{stats.totalSales}€</h3>
+                  <h3 className="text-2xl font-mono font-black text-neutral-900">{stats.totalSales} DZD</h3>
                   <p className="text-[9px] text-emerald-600 font-mono font-semibold mt-1">✓ +14.5% cette semaine</p>
                 </div>
               </div>
@@ -473,12 +476,12 @@ export const Dashboard: React.FC = () => {
               <div className="bg-white p-5 rounded-2xl border border-neutral-150 shadow-sm flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/20 rounded-full blur-xl" />
                 <div className="flex items-center justify-between text-neutral-400">
-                  <span className="text-[10px] tracking-widest font-mono uppercase font-bold">Recette Mensuelle</span>
+                  <span className="text-[10px] tracking-widest font-mono uppercase font-bold">Caisse Mensuelle</span>
                   <CreditCard size={16} className="text-blue-500" />
                 </div>
                 <div className="mt-4">
-                  <h3 className="text-2xl font-mono font-black text-neutral-900">{stats.monthlyRevenue}€</h3>
-                  <p className="text-[9px] text-neutral-400 font-sans mt-1">Objectif fixé : 5,000€</p>
+                  <h3 className="text-2xl font-mono font-black text-neutral-900">{stats.monthlyRevenue} DZD</h3>
+                  <p className="text-[9px] text-neutral-400 font-sans mt-1">Objectif fixé : 5,000 DZD</p>
                 </div>
               </div>
 
@@ -528,7 +531,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex items-center gap-4 text-xs font-mono">
                   <div className="flex items-center gap-1.5">
                     <span className="w-3 h-3 bg-[#BF986B] rounded-full inline-block" />
-                    <span>Recettes</span>
+                    <span>Caisse</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-3 h-3 bg-neutral-300 rounded-full inline-block" />
@@ -627,7 +630,7 @@ export const Dashboard: React.FC = () => {
 
                       <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                         <span className="font-mono font-bold text-neutral-700 shrink-0">
-                          {ord.totalPrice}€
+                          {ord.totalPrice} DZD
                         </span>
                         <span className={`px-2.5 py-1 text-[9px] uppercase tracking-widest font-mono font-bold rounded-full ${badgeColor}`}>
                           {ord.status}
@@ -650,7 +653,7 @@ export const Dashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="font-serif text-2xl md:text-3xl font-light text-neutral-800 uppercase tracking-wide">
-                  Catalogue Maroquinerie
+                  Catalogue Catégorie
                 </h1>
                 <p className="text-xs text-neutral-400 font-mono tracking-widest mt-1">
                   Créez, éditez ou retirez des sacs haut de gamme de la boutique en ligne.
@@ -710,8 +713,8 @@ export const Dashboard: React.FC = () => {
                   <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
                     
                     <div className="text-right font-mono text-sm uppercase">
-                      <p className="font-bold text-neutral-800">{p.price}€</p>
-                      {p.oldPrice && <p className="text-[10px] text-neutral-400 line-through">{p.oldPrice}€</p>}
+                      <p className="font-bold text-neutral-800">{p.price} DZD</p>
+                      {p.oldPrice && <p className="text-[10px] text-neutral-400 line-through">{p.oldPrice} DZD</p>}
                     </div>
 
                     {/* Action buttons */}
@@ -907,7 +910,7 @@ export const Dashboard: React.FC = () => {
                               <span className="font-serif font-medium uppercase truncate text-neutral-850">{it.name}</span>
                             </div>
                             <span className="font-mono font-bold shrink-0">
-                              Qty: {it.quantity} x {it.price}€ (<span className="inline-block w-2.5 h-2.5 rounded-full align-middle border" style={{ backgroundColor: it.color }} />)
+                              Qty: {it.quantity} x {it.price} DZD (<span className="inline-block w-2.5 h-2.5 rounded-full align-middle border" style={{ backgroundColor: it.color }} />)
                             </span>
                           </div>
                         ))}
@@ -922,7 +925,7 @@ export const Dashboard: React.FC = () => {
                       Méthode: {ord.paymentMethod === 'card' ? 'Visa/Mastercard' : ord.paymentMethod === 'paypal' ? 'Paypal Secure' : 'Contre remboursement'}
                     </span>
                     <span className="font-mono font-bold text-sm text-neutral-850">
-                      Montant Versé : <span className="text-lg font-black text-neutral-900">{ord.totalPrice}€</span>
+                      Montant Versé : <span className="text-lg font-black text-neutral-900">{ord.totalPrice} DZD</span>
                     </span>
                   </div>
 
@@ -951,16 +954,16 @@ export const Dashboard: React.FC = () => {
               
               <div className="bg-white p-6 rounded-3xl border border-neutral-150 shadow-sm flex flex-col gap-4">
                 <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Encaissements Totaux</span>
-                <span className="text-3xl font-mono font-black text-neutral-900">{stats.totalSales}€</span>
+                <span className="text-3xl font-mono font-black text-neutral-900">{stats.totalSales} DZD</span>
                 <div className="pt-3 border-t border-neutral-100 flex justify-between text-neutral-500 text-xs">
                   <span>Panier Moyen par client :</span>
-                  <span className="font-bold text-neutral-700 font-mono">{averageBasketValue}€</span>
+                  <span className="font-bold text-neutral-700 font-mono">{averageBasketValue} DZD</span>
                 </div>
               </div>
 
               <div className="bg-white p-6 rounded-3xl border border-neutral-150 shadow-sm flex flex-col gap-4">
                 <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Dettes & Taxes Prélevées</span>
-                <span className="text-3xl font-mono font-black text-neutral-900">{Math.round(stats.totalSales * 0.05)}€</span>
+                <span className="text-3xl font-mono font-black text-neutral-900">{Math.round(stats.totalSales * 0.05)} DZD</span>
                 <div className="pt-3 border-t border-neutral-100 flex justify-between text-neutral-500 text-xs">
                   <span>Impôt d'art (5%) :</span>
                   <span className="font-bold text-neutral-700 font-mono">Collecté d'office</span>
@@ -969,7 +972,7 @@ export const Dashboard: React.FC = () => {
 
               <div className="bg-white p-6 rounded-3xl border border-neutral-150 shadow-sm flex flex-col gap-4">
                 <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Marge nette estimée</span>
-                <span className="text-3xl font-mono font-black text-neutral-900">{Math.round(stats.totalSales * 0.85)}€</span>
+                <span className="text-3xl font-mono font-black text-neutral-900">{Math.round(stats.totalSales * 0.85)} DZD</span>
                 <div className="pt-3 border-t border-neutral-100 flex justify-between text-neutral-500 text-xs">
                   <span>Efficacité Opérationnelle :</span>
                   <span className="font-semibold text-emerald-600 font-mono">85% Margé</span>
@@ -1000,7 +1003,7 @@ export const Dashboard: React.FC = () => {
                         <td className="px-6 py-4 font-mono font-bold text-neutral-800">{ord.id}</td>
                         <td className="px-6 py-4">{ord.customerName}</td>
                         <td className="px-6 py-4 text-center font-mono text-neutral-400 uppercase">{ord.paymentMethod}</td>
-                        <td className="px-6 py-4 text-right font-mono font-bold text-neutral-900">{ord.totalPrice}€</td>
+                        <td className="px-6 py-4 text-right font-mono font-bold text-neutral-900">{ord.totalPrice} DZD</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1035,7 +1038,7 @@ export const Dashboard: React.FC = () => {
                     <span className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">Nom d'enseigne</span>
                     <input
                       type="text"
-                      defaultValue="Marilyn Aura (Haute Maroquinerie)"
+                      defaultValue="MV LUXURY (Vendeuse)"
                       className="bg-neutral-50 px-3 py-2 border rounded-lg focus:outline"
                     />
                   </div>
@@ -1181,7 +1184,7 @@ export const Dashboard: React.FC = () => {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
-                      Prix d’achat (€)
+                      Prix d’achat (DZD)
                     </label>
                     <input
                       type="number"
@@ -1195,7 +1198,7 @@ export const Dashboard: React.FC = () => {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
-                      Ancien Prix (€)
+                      Ancien Prix (DZD)
                     </label>
                     <input
                       type="number"
@@ -1272,21 +1275,40 @@ export const Dashboard: React.FC = () => {
                       <button
                         key={i}
                         type="button"
-                        onClick={() => setProdImageChosen(imgUrl)}
+                        onClick={() => { setProdImageChosen(imgUrl); setProdCustomImageUrl(''); }}
                         className={`aspect-square rounded-lg overflow-hidden border transition-all relative ${
-                          prodImageChosen === imgUrl
+                          prodImageChosen === imgUrl && !prodCustomImageUrl
                             ? 'border-[#BF986B] ring-2 ring-[#BF986B]/30 scale-95 font-bold'
                             : 'border-transparent hover:scale-95'
                         }`}
                       >
                         <img src={imgUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                        {prodImageChosen === imgUrl && (
+                        {prodImageChosen === imgUrl && !prodCustomImageUrl && (
                           <div className="absolute inset-0 bg-[#BF986B]/15 flex items-center justify-center font-mono text-[8px] text-[#2C2621]">
                             Focus
                           </div>
                         )}
                       </button>
                     ))}
+                  </div>
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <label className="text-[9px] uppercase tracking-widest text-[#BF986B] font-mono font-bold">
+                      Ou ajouter une image personnalisée (URL)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="https://example.com/image.jpg"
+                        value={prodCustomImageUrl}
+                        onChange={(e) => { setProdCustomImageUrl(e.target.value); if (e.target.value) setProdImageChosen(e.target.value); }}
+                        className="flex-1 bg-neutral-50 px-3 py-2 text-xs border rounded-lg focus:outline-none focus:border-neutral-900"
+                      />
+                      {prodCustomImageUrl && (
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border shrink-0 bg-neutral-100">
+                          <img src={prodCustomImageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
