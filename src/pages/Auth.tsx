@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Mail, Lock, User, Key, ArrowRight, ShieldCheck } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 export const Auth: React.FC = () => {
-  const { login, register, navigateTo, showToast } = useApp();
-  const [formType, setFormType] = useState<'login' | 'register' | 'forgot'>('login');
+  const { login, register, navigateTo, showToast, customRoute } = useApp();
+  const initialFormType = customRoute.page === 'register' ? 'register' : 'login';
+  const [formType, setFormType] = useState<'login' | 'register' | 'forgot'>(initialFormType);
   const [submitting, setSubmitting] = useState(false);
 
   const [email, setEmail] = useState('');
